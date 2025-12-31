@@ -23,11 +23,11 @@ Source: "C:\Users\mapsp\Documents\GitHub\hollow_knight_silksong\hollow_knight_si
 
 [Icons]
 ; Acceso directo en el escritorio
-Name: "{userdesktop}\Hollow Knight: Silksong"; Filename: "{app}\installer_updater.exe"; IconFilename: "{app}\hollow_knight_silksong.ico"
+Name: "{userdesktop}\Hollow Knight: Silksong"; Filename: "{app}\installer_updater.exe"; IconFilename: "{app}\hollow_knight_silksong.ico"; Comment: "Lanzador de Hollow Knight: Silksong"; WorkingDir: "{app}"
 
-; Acceso directo en el menú de inicio dentro de la carpeta StormLauncher_HMCL-Edition
-Name: "{commonprograms}\StormGamesStudios\Hollow Knight: Silksong"; Filename: "{app}\installer_updater.exe"; IconFilename: "{app}\hollow_knight_silksong.ico"
-Name: "{commonprograms}\StormGamesStudios\Desinstalar Hollow Knight: Silksong"; Filename: "{uninstallexe}"; IconFilename: "{app}\hollow_knight_silksong.ico"
+; Acceso directo en el menú de inicio dentro de la carpeta StormGamesStudios
+Name: "{commonprograms}\StormGamesStudios\Hollow Knight: Silksong"; Filename: "{app}\installer_updater.exe"; IconFilename: "{app}\hollow_knight_silksong.ico"; Comment: "Lanzador de Hollow Knight: Silksong"; WorkingDir: "{app}"
+Name: "{commonprograms}\StormGamesStudios\Desinstalar Hollow Knight: Silksong"; Filename: "{uninstallexe}"; IconFilename: "{app}\hollow_knight_silksong.ico"; Comment: "Desinstalar Hollow Knight: Silksong"
 
 [Registry]
 ; Guardar ruta de instalación para poder desinstalar
