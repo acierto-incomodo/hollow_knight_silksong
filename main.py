@@ -12,9 +12,12 @@ from PySide6 import QtCore, QtWidgets, QtGui
 
 # ---------------- CONFIG ------------------
 
-LAUNCHER_VERSION = "1.0.0"
+LAUNCHER_VERSION = "1.0.1"
 
-BUILD_URL_WIN = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/Build.zip"
+# Windows build is split into two parts
+BUILD_URL_WIN_PART1 = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/Part1.zip"
+BUILD_URL_WIN_PART2 = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/Part2.zip"
+BUILD_URL_WIN_PART3 = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/Part3.zip"
 BUILD_URL_LINUX = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/Build.zip"
 VERSION_URL = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/Version.txt"
 RELEASE_NOTES_URL = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/ReleaseNotes.txt"
@@ -52,8 +55,8 @@ def download_file(url: str, dest: Path, progress_callback=None, chunk_size=8192)
     return dest
 
 
-def extract_zip(zip_path: Path, to_dir: Path):
-    if to_dir.exists():
+def extract_zip(zip_path: Path, to_dir: Path, clear: bool = True):
+    if clear and to_dir.exists():
         shutil.rmtree(to_dir)
     to_dir.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zip_path, "r") as z:
@@ -83,7 +86,7 @@ class LauncherWindow(QtWidgets.QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Hollow Knight:  Silksong - Launcher")
+        self.setWindowTitle("Hollow Knight: Silksong - Launcher")
         self.setMinimumSize(520, 420)
         self.setMaximumSize(520, 420)
         self.setWindowIcon(QtGui.QIcon.fromTheme("applications-games"))
@@ -279,13 +282,15 @@ class LauncherWindow(QtWidgets.QWidget):
     def _update_thread(self):
         try:
             if sys.platform.startswith("win"):
-                build_url = BUILD_URL_WIN
-                zip_name = "Build.zip"
+                downloads = [
+                    (BUILD_URL_WIN_PART1, "Part1.zip"),
+                    (BUILD_URL_WIN_PART2, "Part2.zip"),
+                    (BUILD_URL_WIN_PART3, "Part3.zip"),
+                ]
             else:
-                build_url = BUILD_URL_LINUX
-                zip_name = "BuildLinux.zip"
-
-            zip_path = DOWNLOAD_DIR / zip_name
+                downloads = [
+                    (BUILD_URL_LINUX, "BuildLinux.zip"),
+                ]
 
             def progress_cb(downloaded, total):
                 percent = int(downloaded * 100 / total) if total else 0
@@ -295,14 +300,34 @@ class LauncherWindow(QtWidgets.QWidget):
                     QtCore.Q_ARG(int, percent)
                 )
 
-            download_file(build_url, zip_path, progress_cb)
+            for idx, (url, zip_name) in enumerate(downloads):
+                zip_path = DOWNLOAD_DIR / zip_name
+                self.set_status(f"Descargando {zip_name}...")
+                download_file(url, zip_path, progress_cb)
 
-            self.set_status("Extrayendo archivos...")
-            extract_zip(zip_path, BUILD_DIR)
+                self.set_status(f"Extrayendo {zip_name}...")
+                # clear BUILD_DIR on first part, keep files on subsequent parts
+                extract_zip(zip_path, BUILD_DIR, clear=(idx == 0))
+
+                # eliminar archivo zip descargado
+                try:
+                    zip_path.unlink()
+                except Exception:
+                    pass
 
             self.set_status("Descargando Version.txt...")
             version = requests.get(VERSION_URL, timeout=30).text.strip()
             VERSION_FILE.write_text(version, encoding="utf-8")
+
+            # Eliminar archivos descargados en DOWNLOAD_DIR al terminar la actualización
+            try:
+                for p in DOWNLOAD_DIR.iterdir():
+                    if p.is_dir():
+                        shutil.rmtree(p)
+                    else:
+                        p.unlink()
+            except Exception:
+                pass
 
             QtCore.QMetaObject.invokeMethod(
                 self, "on_update_done",
