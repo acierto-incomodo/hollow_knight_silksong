@@ -1,0 +1,4 @@
+*.spec
+/build
+launcher_win.py
+dist/installer_updater.exe
