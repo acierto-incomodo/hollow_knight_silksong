@@ -1,7 +1,7 @@
 Cambios
 
-Launcher (v1.0.1):
-- NaN
+Launcher (v1.0.2):
+- Reparado
 
-Juego (v1.0.1):
-- NaN
+Juego (v1.0.2):
+- Mini actualización de compatibilidad
