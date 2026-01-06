@@ -12,7 +12,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 
 # ---------------- CONFIG ------------------
 
-LAUNCHER_VERSION = "1.0.2"
+LAUNCHER_VERSION = "1.0.3"
 
 # Windows build is split into two parts
 BUILD_URL_WIN_PART1 = "https://github.com/acierto-incomodo/hollow_knight_silksong/releases/latest/download/Part1.zip"
